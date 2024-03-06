@@ -83,12 +83,12 @@ if (isset($_POST['button'])) {
             $rnd = (!isset($_POST['round'])) ? 1 : (int) $_POST['round'];
             $status = true;
             for ($i = 0; $i < $teamsCount/2; $i++) {
-                list($exitStatus, $mid) = Match::create(array('team1_id' => $team_ids[$i*2], 'team2_id' => $team_ids[$i*2+1], 'round' => $rnd, 'f_tour_id' => (int) $_POST['existTour']));
+                [$exitStatus, $mid] = BloodBowlMatch::create(array('team1_id' => $team_ids[$i*2], 'team2_id' => $team_ids[$i*2+1], 'round' => $rnd, 'f_tour_id' => (int) $_POST['existTour']));
                 $status &= !$exitStatus;
                 if ($exitStatus)
                     break;
             }
-            status($status, $exitStatus ? Match::$T_CREATE_ERROR_MSGS[$exitStatus] : null);
+            status($status, $exitStatus ? BloodBowlMatch::$T_CREATE_ERROR_MSGS[$exitStatus] : null);
         }
         // Create new tour...
         else {
@@ -243,7 +243,7 @@ $commonStyle = "float:left; width:45%; height:300px; margin:10px;";
         // FFA settings.
         $body .= $lng->getTrn('admin/schedule/as_type').'<br>';
         $body .= '<select name="round">';
-        $T_ROUNDS = Match::getRounds();;
+        $T_ROUNDS = BloodBowlMatch::getRounds();;
         foreach ($T_ROUNDS as $r => $d) {
                 $body .= "<option value='$r' ".(($addMatchToFFA && isset($_POST['round']) && $r == $_POST['round']) ? 'SELECTED' : '').">".$d."</option>\n";
         }

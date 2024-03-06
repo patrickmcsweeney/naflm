@@ -48,7 +48,7 @@ if (isset($_FILES['xmlfile'])) {
                     break;
                 }
                 
-                list($status1, $pid) = Player::create(array(
+                [$status1, $pid] = Player::create(array(
                     'nr' => $p->nr, 'f_pos_id' => $p->pos_id, 'name' => $p->name, 'team_id' => $tid
                     ), array('force' => true, 'free' => true)
                 );
@@ -65,11 +65,11 @@ if (isset($_FILES['xmlfile'])) {
                 foreach (array('ma', 'st', 'ag', 'av', 'ni') as $inj) {
                     $agn = $T_INJS_REV[strtoupper($inj)];
                     while ($p->{$inj}-- > 0) {
-                        $status2 &= Match::ImportEntry($pid, array_merge(array_fill_keys(array_merge($T_PMD_ACH, $T_PMD_IR),0), array_combine($T_PMD_INJ, array($pstatus,$agn,($p->{$inj}-- > 0) ? $agn : NONE))));
+                        $status2 &= BloodBowlMatch::ImportEntry($pid, array_merge(array_fill_keys(array_merge($T_PMD_ACH, $T_PMD_IR),0), array_combine($T_PMD_INJ, array($pstatus,$agn,($p->{$inj}-- > 0) ? $agn : NONE))));
                     }
                 }
                 # Set player achievements
-                $status2 &= Match::ImportEntry($pid, array_merge(array_intersect_key((array) $p, array_fill_keys($T_PMD_ACH,null)), array_combine($T_PMD_INJ,array($pstatus,NONE,NONE)), array_fill_keys($T_PMD_IR,0)));
+                $status2 &= BloodBowlMatch::ImportEntry($pid, array_merge(array_intersect_key((array) $p, array_fill_keys($T_PMD_ACH,null)), array_combine($T_PMD_INJ,array($pstatus,NONE,NONE)), array_fill_keys($T_PMD_IR,0)));
                 status($status2, "Added to '$t->name' player '$p->name'");
             }
             

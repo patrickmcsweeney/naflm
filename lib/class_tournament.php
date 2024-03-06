@@ -53,7 +53,7 @@ class Tour {
         $result = mysql_query("SELECT match_id FROM matches WHERE f_tour_id = $this->tour_id ORDER BY match_id ASC");
         if (mysql_num_rows($result) > 0) {
             while ($row = mysql_fetch_assoc($result)) {
-                array_push($matches, new Match($row['match_id']));
+                array_push($matches, new BloodBowlMatch($row['match_id']));
             }
         }
         return $matches;
@@ -193,7 +193,7 @@ class Tour {
         if ($input['type'] == TT_FFA) {
             $status = true;
             for ($i = 0; $i < count($input['teams'])/2; $i++) {
-                 list($exitStatus, $mid) = Match::create(array(
+                 [$exitStatus, $mid] = BloodBowlMatch::create(array(
                     'team1_id'  => $input['teams'][$i*2],
                     'team2_id'  => $input['teams'][$i*2+1],
                     'round'     => (($input['rounds']) ? $input['rounds'] : 1),
@@ -234,7 +234,7 @@ class Tour {
                 // Create new bracket.
                 foreach ($rounds as $ridx => $r) {
                     foreach ($r as $match) { // Depict round's match compets inversely for every other round.
-                        list($exitStatus, $mid) = Match::create(array('team1_id' => $match[0], 'team2_id' => $match[1], 'round' => $ridx + ($i-1)*($real_rounds), 'f_tour_id' => $tour_id));
+                        [$exitStatus, $mid] = BloodBowlMatch::create(array('team1_id' => $match[0], 'team2_id' => $match[1], 'round' => $ridx + ($i-1)*($real_rounds), 'f_tour_id' => $tour_id));
                         $status &= !$exitStatus;
                     }
                 }

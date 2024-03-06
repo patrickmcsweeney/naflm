@@ -8,7 +8,7 @@ if (!Coach::isLoggedIn())
 
 $action = $_REQUEST["action"];
 if($action == "update") {
-    $match = new Match($_POST["match_id"]);
+    $match = new BloodBowlMatch($_POST["match_id"]);
     
     function pushIfSet(&$inputArray, $key, $value, $convert) {
         if($value != null)
@@ -46,7 +46,7 @@ if($action == "update") {
 
     $team = new Team($_POST["team_id"]);    
     foreach ($team->getPlayers() as $player) {
-        if (!Match::player_validation($player, $match))
+        if (!BloodBowlMatch::player_validation($player, $match))
             continue;
 
         // We create zero entries for MNG player(s). This is required!
@@ -93,7 +93,7 @@ if($action == "update") {
     $match->finalizeMatchSubmit();
     
 } else if($action == "getplayerentries") {
-    $match = new Match($_REQUEST["match_id"]);
+    $match = new BloodBowlMatch($_REQUEST["match_id"]);
     $team = new Team($_REQUEST["team_id"]);
     $playerEntries = array();
     foreach($team->getPlayers() as $player) {

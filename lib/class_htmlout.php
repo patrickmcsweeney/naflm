@@ -21,7 +21,7 @@ class HTMLOUT
 			 );
 		*/
 		global $lng;
-		$T_ROUNDS = Match::getRounds();
+		$T_ROUNDS = BloodBowlMatch::getRounds();
 		$extra = array('doNr' => false, 'noHelp' => true);
 		if (!array_key_exists('GET_SS', $opts)) {$opts['GET_SS'] = '';}
 		else {$extra['GETsuffix'] = $opts['GET_SS'];} # GET Sorting Suffix
@@ -36,9 +36,9 @@ class HTMLOUT
 		
 		$FOR_OBJ = $obj;
 		if ($obj && $obj_id) {
-			list($matches, $pages) = Stats::getMatches($obj, $obj_id, $node, $node_id, $opp_obj, $opp_obj_id, $N, true, false);
+			[$matches, $pages] = Stats::getMatches($obj, $obj_id, $node, $node_id, $opp_obj, $opp_obj_id, $N, true, false);
 		} else {
-			list($matches, $pages) = Match::getMatches($N, ($node) ? $node : false, ($node) ? $node_id : false, false);
+			[$matches, $pages] = BloodBowlMatch::getMatches($N, ($node) ? $node : false, ($node) ? $node_id : false, false);
 		}
 		$extra['page'] = $N[0];
 		$extra['pages'] = $pages;
@@ -92,7 +92,7 @@ class HTMLOUT
 			 );
 		*/
 		global $lng;
-		$T_ROUNDS = Match::getRounds();
+		$T_ROUNDS = BloodBowlMatch::getRounds();
 		$extra = array('doNr' => false, 'noHelp' => true);
 		if (!array_key_exists('GET_SS', $opts)) {$opts['GET_SS'] = '';}
 		else {$extra['GETsuffix'] = $opts['GET_SS'];} # GET Sorting Suffix
@@ -105,9 +105,9 @@ class HTMLOUT
 				: array(1,$opts['n']);
 		}
 		if ($obj && $obj_id) {
-			list($matches, $pages) = Stats::getMatches($obj, $obj_id, $node, $node_id, $opp_obj, $opp_obj_id, $N, true, true);
+			[$matches, $pages] = Stats::getMatches($obj, $obj_id, $node, $node_id, $opp_obj, $opp_obj_id, $N, true, true);
 		} else {
-			list($matches, $pages) = Match::getMatches($N, ($node) ? $node : false, ($node) ? $node_id : false, true);
+			[$matches, $pages] = BloodBowlMatch::getMatches($N, ($node) ? $node : false, ($node) ? $node_id : false, true);
 		}
 		$extra['page'] = $N[0];
 		$extra['pages'] = $pages;
@@ -302,12 +302,12 @@ class HTMLOUT
 		# NO filters for teams of a coach on the coach's teams list.
 		$_COACH_TEAM_LIST = ($W_TEAMS_FROM && $opts['teams_from'] == T_OBJ_COACH);
 		if ($_COACH_TEAM_LIST) {
-			list(,,$T_STATE) = HTMLOUT::nodeSelector(array('nonodes' => true, 'state' => true)); # Produces a state selector.
+			[,,$T_STATE] = HTMLOUT::nodeSelector(array('nonodes' => true, 'state' => true)); # Produces a state selector.
 			$_SELECTOR = array(false,false,$T_STATE,T_RACE_ALL,'GENERAL','mv_played',self::T_NS__ffilter_ineq_gt,0);
 		} else {
 			$_SELECTOR = HTMLOUT::nodeSelector(array('force_node' => array($node,$node_id), 'race' => $enableRaceSelector, 'sgrp' => true, 'ffilter' => true, 'obj' => $obj));
 		}
-		list($sel_node, $sel_node_id, $sel_state, $sel_race, $sel_sgrp, $sel_ff_field, $sel_ff_ineq, $sel_ff_limit) = $_SELECTOR;
+		[$sel_node, $sel_node_id, $sel_state, $sel_race, $sel_sgrp, $sel_ff_field, $sel_ff_ineq, $sel_ff_limit] = $_SELECTOR;
 		$filter_node = array($sel_node => $sel_node_id);
 		$filter_race = ($sel_race != T_RACE_ALL) ? array(T_OBJ_RACE => $sel_race) : array();
 		$filter_having = array('having' => array($sel_ff_field.(($sel_ff_ineq == self::T_NS__ffilter_ineq_gt) ? '>=' : '<=').$sel_ff_limit));
@@ -349,7 +349,7 @@ class HTMLOUT
 					'f_tname' => array('desc' => $lng->getTrn('common/team'),   'href' => array('link' => urlcompile(T_URL_PROFILE,T_OBJ_TEAM,false,false,false), 'field' => 'obj_id', 'value' => 'owned_by_team_id')),
 				);
 				$PAGELENGTH = $settings['standings']['length_players'];
-				list($objs, $PAGES) = Stats::getRaw(T_OBJ_PLAYER, $filter_node+$filter_having+$filter_race, array($PAGE, $PAGELENGTH), $sortRule, $set_avg);
+				[$objs, $PAGES] = Stats::getRaw(T_OBJ_PLAYER, $filter_node+$filter_having+$filter_race, array($PAGE, $PAGELENGTH), $sortRule, $set_avg);
 				break;
 			case STATS_TEAM:
 				$tblTitle = $lng->getTrn('menu/statistics_menu/team_stn');
@@ -361,17 +361,17 @@ class HTMLOUT
 				{
 					case T_OBJ_COACH:
 						$fields_before['f_rname'] = array('desc' => $lng->getTrn('common/race'), 'href' => array('link' => urlcompile(T_URL_PROFILE,T_OBJ_RACE,false,false,false), 'field' => 'obj_id', 'value' => 'f_race_id'));
-						list($objs, $PAGES) = Stats::getRaw(T_OBJ_TEAM, $filter_node+$filter_having+$filter_race+array(T_OBJ_COACH => (int) $opts['teams_from_id']), false, $sortRule, $set_avg);
+						[$objs, $PAGES] = Stats::getRaw(T_OBJ_TEAM, $filter_node+$filter_having+$filter_race+array(T_OBJ_COACH => (int) $opts['teams_from_id']), false, $sortRule, $set_avg);
 						break;
 					case T_OBJ_RACE:
 						$fields_before['f_cname'] = array('desc' => $lng->getTrn('common/coach'), 'href' => array('link' => urlcompile(T_URL_PROFILE,T_OBJ_COACH,false,false,false), 'field' => 'obj_id', 'value' => 'owned_by_coach_id'));
 						$PAGELENGTH = $settings['standings']['length_teams'];
-						list($objs, $PAGES) = Stats::getRaw(T_OBJ_TEAM, $filter_node+$filter_having+array(T_OBJ_RACE => (int) $opts['teams_from_id']), array($PAGE, $PAGELENGTH), $sortRule, $set_avg);
+						[$objs, $PAGES] = Stats::getRaw(T_OBJ_TEAM, $filter_node+$filter_having+array(T_OBJ_RACE => (int) $opts['teams_from_id']), array($PAGE, $PAGELENGTH), $sortRule, $set_avg);
 						break;
 					// All teams
 					default:
 						$PAGELENGTH = $settings['standings']['length_teams'];
-						list($objs, $PAGES) = Stats::getRaw(T_OBJ_TEAM, $filter_node+$filter_having+$filter_race, array($PAGE, $PAGELENGTH), $sortRule, $set_avg);
+						[$objs, $PAGES] = Stats::getRaw(T_OBJ_TEAM, $filter_node+$filter_having+$filter_race, array($PAGE, $PAGELENGTH), $sortRule, $set_avg);
 				}
 				// Translating race name
 				foreach($objs as &$o)
@@ -392,7 +392,7 @@ class HTMLOUT
 				if ($dash_empty) {
 					$extra['dashed'] = array('condField' => $dash_empty, 'fieldVal' => 0, 'noDashFields' => array('name'));
 				}
-				list($objs, $PAGES) = Stats::getRaw(T_OBJ_RACE, $filter_node+$filter_having, false, $sortRule, $set_avg);
+				[$objs, $PAGES] = Stats::getRaw(T_OBJ_RACE, $filter_node+$filter_having, false, $sortRule, $set_avg);
 				// Translating race name
 				foreach($objs as &$o)
 				  $o['name'] = $lng->getTrn('race/'.strtolower(str_replace(' ','', $o['name'])));
@@ -403,7 +403,7 @@ class HTMLOUT
 					'name' => array('desc' => $lng->getTrn('common/coach'), 'href' => array('link' => urlcompile(T_URL_PROFILE,T_OBJ_COACH,false,false,false), 'field' => 'obj_id', 'value' => 'coach_id')),
 				);
 				$PAGELENGTH = $settings['standings']['length_coaches'];
-				list($objs, $PAGES) = Stats::getRaw(T_OBJ_COACH, $filter_node+$filter_having, array($PAGE, $PAGELENGTH), $sortRule, $set_avg);
+				[$objs, $PAGES] = Stats::getRaw(T_OBJ_COACH, $filter_node+$filter_having, array($PAGE, $PAGELENGTH), $sortRule, $set_avg);
 				break;
 			case STATS_STAR:
 				$tblTitle = $lng->getTrn('menu/statistics_menu/star_stn');
@@ -417,7 +417,7 @@ class HTMLOUT
 					'av'     => array('desc' => 'Av'),
 				);
 				$extra['dashed'] = array('condField' => 'mv_played', 'fieldVal' => 0, 'noDashFields' => array('name'));
-				list($objs, $PAGES) = Stats::getRaw(T_OBJ_STAR, $filter_node+$filter_having, false, $sortRule, $set_avg);
+				[$objs, $PAGES] = Stats::getRaw(T_OBJ_STAR, $filter_node+$filter_having, false, $sortRule, $set_avg);
 				break;
 		}
 		foreach ($objs as $idx => $obj) {$objs[$idx] = (object) $obj;}
@@ -547,7 +547,7 @@ class HTMLOUT
 		// Forcings
 		$force_node = $force_node_id = false;
 		if (isset($opts['force_node']) && is_numeric($opts['force_node'][0]) && is_numeric($opts['force_node'][1])) {
-			list($force_node,$force_node_id) = $opts['force_node'];
+			[$force_node,$force_node_id] = $opts['force_node'];
 		}
 		$NEW = isset($_POST['ANS']);
 		$_SESSION[$s_state] = ($NEW && $setState) ? (int) $_POST['state_in'] : (isset($_SESSION[$s_state]) ? $_SESSION[$s_state] : $def_state);

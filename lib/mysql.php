@@ -801,10 +801,10 @@ foreach (array('players', 'teams', 'coaches', 'races') as $tbl) {
     $idx = "mv_$tbl";
     $core_tables[$idx] = array_merge($core_tables[$idx], $mv_commoncols);
     $idx = "mv_es_$tbl";
-    $core_tables[$idx] = array_merge($core_tables[$idx], array_map(create_function('$c', 'return $c["type"];'), $ES_commoncols));
+    $core_tables[$idx] = array_merge($core_tables[$idx], array_map(function($c){ return $c["type"];}, $ES_commoncols));
 }
 // The ES equivalent to match_data.
-$core_tables['match_data_es'] = array_merge($core_tables['match_data_es'], array_map(create_function('$c', 'return $c["type"];'), $ES_commoncols));
+$core_tables['match_data_es'] = array_merge($core_tables['match_data_es'], array_map(function($c){return $c["type"];}, $ES_commoncols));
 // Table structure references.
 $relations_node = array(
     T_NODE_MATCH        => array('id' => 'match_id', 'parent_id' => 'f_tour_id', 'tbl' => 'matches'),
@@ -929,10 +929,10 @@ function get_parent_id($type, $id, $parent_type) {
     list($zeroEntry) = array_keys($relations);
     $REL_trimmed = array_slice($relations, $type-$zeroEntry, $parent_type-$type);
     $REL_trimmed_padded = $REL_trimmed;
-    $tables = array_map(create_function('$rl', 'return $rl["tbl"];'), $REL_trimmed);
+    $tables = array_map(function($rl){ return $rl["tbl"];}, $REL_trimmed);
     array_pop($REL_trimmed);
     array_shift($REL_trimmed_padded);
-    $wheres = array_map(create_function('$rl,$rl_next', 'return "$rl[tbl].$rl[parent_id] = $rl_next[tbl].$rl_next[id]";'), $REL_trimmed, $REL_trimmed_padded);
+    $wheres = array_map(function($rl,$rl_next) {return "$rl[tbl].$rl[parent_id] = $rl_next[tbl].$rl_next[id]";}, $REL_trimmed, $REL_trimmed_padded);
     $query = 'SELECT '.$relations[$parent_type-1]['parent_id'].' AS "parent_id" FROM '.implode(',', $tables).' WHERE '.$relations[$type]['id']."=$id".((!empty($wheres)) ? ' AND '.implode(' AND ', $wheres) : '');
     $result = mysql_query($query);
     $row = mysql_fetch_assoc($result);

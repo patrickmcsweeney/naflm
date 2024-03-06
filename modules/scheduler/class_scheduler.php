@@ -813,7 +813,7 @@ public static function apa_generate_schedule($draw) {
             <td class="match" style="text-align: left;"><?php echo $t2->name;?></td>
 
 			<?php 
-				list($exitStatus, $mid) = Match::create(
+				[$exitStatus, $mid] = BloodBowlMatch::create(
 					array(
 						'team1_id' => $t1->team_id, 
 						'team2_id' => $t2->team_id, 
@@ -826,7 +826,7 @@ public static function apa_generate_schedule($draw) {
 					if ($exitStatus == '') {
 						echo "<td class=\"success\">" . $lng->getTrn('schedule_successfull', __CLASS__). "</td>";
 					} else {
-						echo "<td class=\"error\">" . Match::$T_CREATE_ERROR_MSGS[$exitStatus] . "</td>";
+						echo "<td class=\"error\">" . BloodBowlMatch::$T_CREATE_ERROR_MSGS[$exitStatus] . "</td>";
 					}
 				?>
 			</tr>
@@ -850,7 +850,7 @@ public static function schedule_custom_game() {
 	$t2 = new Team($teamsClean[1]);
 	$rnd = (int) str_replace('round_', '', $_POST['round']);
 	
-	list($exitStatus, $mid) = Match::create(
+	[$exitStatus, $mid] = BloodBowlMatch::create(
 		array(
 			'team1_id' => $t1->team_id, 
 			'team2_id' => $t2->team_id, 
@@ -871,7 +871,7 @@ public static function schedule_custom_game() {
 		$status =  $lng->getTrn('schedule_successfull', __CLASS__);
 		$htmlclass = 'success';
 	} else {
-		$status = Match::$T_CREATE_ERROR_MSGS[$exitStatus];
+		$status = BloodBowlMatch::$T_CREATE_ERROR_MSGS[$exitStatus];
 		$htmlclass = 'error';
 	}
 	

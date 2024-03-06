@@ -192,7 +192,7 @@ class Player
         }
         $allowed = $NONE_ALLOWED = array('N' => false, 'D' => false, 'C' => array());
         foreach (array_reverse($IRs) as $IR) {
-            list($D1,$D2) = $IR;
+            [$D1,$D2] = $IR;
             switch ($D1+$D2) {
                 case 12: $chr = array(ST); break;
                 case 11: $chr = array(AG); break;
@@ -492,7 +492,7 @@ class Player
         ";
         if (($result = mysql_query($query)) && mysql_num_rows($result) > 0) {
             while ($row = mysql_fetch_assoc($result)) {
-                array_push($matches, array_merge(array('match_obj' => new Match($row['f_match_id'])), $row));
+                array_push($matches, array_merge(array('match_obj' => new BloodBowlMatch($row['f_match_id'])), $row));
             }
         }
         return $matches;
@@ -506,7 +506,7 @@ class Player
         $query = "SELECT mvp, cp, td, intcpt, bh, ki, si, f_match_id FROM match_data, matches WHERE match_id > 0 AND f_match_id = match_id AND f_player_id = $this->player_id AND ($type) > 0 ORDER BY date_played DESC";
         if (($result = mysql_query($query)) && mysql_num_rows($result) > 0) {
             while ($row = mysql_fetch_assoc($result)) {
-                array_push($mdata, array_merge($row, array('match_obj' => new Match($row['f_match_id']))));
+                array_push($mdata, array_merge($row, array('match_obj' => new BloodBowlMatch($row['f_match_id']))));
             }
         }
         return $mdata;
@@ -524,7 +524,7 @@ class Player
     
     public function savePic($name = false) {
         $img = new ImageSubSys(IMGTYPE_PLAYER, $this->player_id);
-        list($retstatus, $error) = $img->save($name);
+        [$retstatus, $error] = $img->save($name);
         return $retstatus;
     }
     
@@ -589,10 +589,10 @@ class Player
 	
     public function getInjHistory() {
         # This method wraps _getInjHistory() with extra information.
-        list($injhist, $stats) = $this->_getInjHistory();
+        [$injhist, $stats] = $this->_getInjHistory();
         $match_objs = array();
         foreach ($stats as $k => $v) {
-            $match_objs[] = new Match($v['mid']);
+            $match_objs[] = new BloodBowlMatch($v['mid']);
         }
         return array($injhist, $stats, $match_objs);
     }
@@ -602,7 +602,7 @@ class Player
      ***************/
     public static function exists($id) {
         $result = mysql_query("SELECT COUNT(*) FROM players WHERE player_id = $id");
-        list($CNT) = mysql_fetch_row($result);
+        [$CNT] = mysql_fetch_row($result);
         return ($CNT == 1);
     }
 

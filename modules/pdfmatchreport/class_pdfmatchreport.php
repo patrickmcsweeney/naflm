@@ -45,7 +45,7 @@ class PDFMatchReport implements ModuleInterface
         if (!empty($argv)) {
             $team1 = new Team($argv[0]);
             $team2 = new Team($argv[1]);
-            $match = new Match($argv[2]);
+            $match = new BloodBowlMatch($argv[2]);
             if (!is_null($team1) && !is_null($team2)) {
                 $FILLED = true;
             }
@@ -301,7 +301,7 @@ class PDFMatchReport implements ModuleInterface
             if ($FILLED) {
                 $players = ${"team$i"}->getPlayers();
                 foreach ($players as $p) {
-                    if (!Match::player_validation($p, $match))
+                    if (!BloodBowlMatch::player_validation($p, $match))
                         continue;
                     array_push($tmp_players, $p);
                 }

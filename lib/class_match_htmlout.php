@@ -8,14 +8,14 @@ $T_MOUT_ACH = array_combine($T_PMD_ACH, array('MVP','Cp','Td','Int','BH','SI','K
 $T_MOUT_IR  = array_combine($T_PMD_IR, array('IR1 D1','IR1 D2','IR2 D1','IR2 D2','IR3 D1','IR3 D2',));
 $T_MOUT_INJ = array_combine($T_PMD_INJ, array('Inj','Ageing 1','Ageing 2'));
 
-class Match_HTMLOUT extends Match
+class Match_HTMLOUT extends BloodBowlMatch
 {
 	const T_HTML_MATCHES_PER_PAGE = 100;
 
 	public static function recentMatches() {
 		global $lng;
 		title($lng->getTrn('menu/matches_menu/recent'));
-		list($node, $node_id) = HTMLOUT::nodeSelector(array());
+		[$node, $node_id] = HTMLOUT::nodeSelector(array());
 		echo '<br>';
 		HTMLOUT::recentGames(false,false,$node,$node_id, false,false,array('url' => 'index.php?section=matches&amp;type=recent', 'n' => MAX_RECENT_GAMES));
 	}
@@ -23,7 +23,7 @@ class Match_HTMLOUT extends Match
 	public static function upcomingMatches() {
 		global $lng;
 		title($lng->getTrn('menu/matches_menu/upcoming'));
-		list($node, $node_id) = HTMLOUT::nodeSelector(array());
+		[$node, $node_id] = HTMLOUT::nodeSelector(array());
 		echo '<br>';
 		HTMLOUT::upcomingGames(false,false,$node,$node_id, false,false,array('url' => 'index.php?section=matches&amp;type=upcoming', 'n' => MAX_RECENT_GAMES));
 	}
@@ -31,7 +31,7 @@ class Match_HTMLOUT extends Match
 	public static function matchActions($IS_LOCAL_ADMIN) {
 		// Admin actions made?
 		if (isset($_GET['action']) && $IS_LOCAL_ADMIN) {
-			$match = new Match((int) $_GET['mid']);
+			$match = new BloodBowlMatch((int)$_GET['mid']);
 			switch ($_GET['action']) {
 				case 'lock':   status($match->setLocked(true)); break;
 				case 'unlock': status($match->setLocked(false)); break;
@@ -56,7 +56,7 @@ class Match_HTMLOUT extends Match
 
 		$query = "SELECT COUNT(*) FROM matches WHERE f_tour_id = $trid";
 		$result = mysql_query($query);
-		list($cnt) = mysql_fetch_row($result);
+		[$cnt] = mysql_fetch_row($result);
 		$pages = ($cnt == 0) ? 1 : ceil($cnt/self::T_HTML_MATCHES_PER_PAGE);
 		global $page;
 		$page = isset($_GET['page']) ? $_GET['page'] : 1; # Page 1 is default, of course.
@@ -234,12 +234,12 @@ class Match_HTMLOUT extends Match
 		global $lng, $stars, $rules, $settings, $coach, $racesHasNecromancer, $racesMayRaiseRotters, $DEA, $T_PMD__ENTRY_EXPECTED;
 		global $T_MOUT_REL, $T_MOUT_ACH, $T_MOUT_IR, $T_MOUT_INJ;
 		global $leagues,$divisions,$tours;
-		$T_ROUNDS = Match::getRounds();
+		$T_ROUNDS = BloodBowlMatch::getRounds();
 		// Perform actions (delete, lock/unlock and reset). Needs the
 		$IS_LOCAL_ADMIN = (is_object($coach) && $coach->isNodeCommish(T_NODE_TOURNAMENT, get_alt_col('matches', 'match_id', $match_id, 'f_tour_id')));
 		self::matchActions($IS_LOCAL_ADMIN);
 		// Create objects
-		$m = new Match($match_id);
+		$m = new BloodBowlMatch($match_id);
 		$team1 = new Team($m->team1_id);
 		$team2 = new Team($m->team2_id);
 		// Determine visitor privileges.
@@ -280,7 +280,7 @@ class Match_HTMLOUT extends Match
 			foreach (array(1 => $team1, 2 => $team2) as $id => $t) {
 				if (in_array($t->f_race_id, $racesHasNecromancer) && isset($_POST["t${id}zombie"])) {
 					$pos_id = $DEA[$t->f_rname]['players']['Zombie']['pos_id'];
-					list($exitStatus,$pid) = Player::create(
+					[$exitStatus,$pid] = Player::create(
 						array(
 							'nr' => $t->getFreePlayerNr(),
 							'f_pos_id' => $pos_id,
@@ -306,7 +306,7 @@ class Match_HTMLOUT extends Match
 				if (in_array($t->f_race_id, $racesMayRaiseRotters) && isset($_POST["t${id}rotterCnt"]) && ($N = (int) $_POST["t${id}rotterCnt"]) > 0) {
 					foreach (range(1,$N) as $n) {
 						$pos_id = $DEA[$t->f_rname]['players']['Rotter']['pos_id'];
-						list($exitStatus,$pid) = Player::create(
+						[$exitStatus,$pid] = Player::create(
 							array(
 								'nr' => $t->getFreePlayerNr(),
 								'f_pos_id' => $pos_id,
@@ -469,8 +469,8 @@ class Match_HTMLOUT extends Match
 			$m->finalizeMatchSubmit(); # Required!
 			MTS('Report submit ENDED');
 			// Refresh objects used to display form.
-			$m = new Match($match_id);
-			$team1 = new Team($m->team1_id);
+			$m = new BloodBowlMatch($match_id);
+            $team1 = new Team($m->team1_id);
 			$team2 = new Team($m->team2_id);
 		}
 		// Change round form submitted?
@@ -830,13 +830,13 @@ class Match_HTMLOUT extends Match
 			$query = "SELECT tour_id AS 'trid', did, f_lid AS 'lid' FROM matches, tours, divisions WHERE match_id = $mid AND f_tour_id = tour_id AND f_did = did";
 			$result = mysql_query($query);
 			$NR = mysql_fetch_assoc($result); # Node Relations.
-			$m = new Match($mid);
-			global $p; # Dirty trick to make $p accessible within create_function() below.
+			$m = new BloodBowlMatch($mid);
+            global $p; # Dirty trick to make $p accessible within create_function() below.
 			$status = true;
 			foreach ($players as $teamPlayers) {
 			foreach ($teamPlayers as $p) {
-				$status &= Match::ESentry(
-					array(
+				$status &= BloodBowlMatch::ESentry(
+                    array(
 						'f_pid' => $p['pid'], 'f_tid' => $p['f_tid'], 'f_cid' => $p['f_cid'], 'f_rid' => $p['f_rid'],
 						'f_mid' => $mid, 'f_trid' => $NR['trid'], 'f_did' => $NR['did'], 'f_lid' => $NR['lid']
 					),
@@ -923,8 +923,8 @@ class Match_HTMLOUT extends Match
 			}
 			// Create match
 			if (!$errmsg) {
-				list($exitStatus, $mid) = Match::create(array(
-					'team1_id'  => $own_team,
+				[$exitStatus, $mid] = BloodBowlMatch::create(array(
+                    'team1_id'  => $own_team,
 					'team2_id'  => get_alt_col('teams', 'name', $_POST['opposing_team_autocomplete'], 'team_id'),
 					'round'     => $round,
 					'f_tour_id' => $trid,
@@ -935,7 +935,7 @@ class Match_HTMLOUT extends Match
 						: "index.php?section=matches&amp;type=report&amp;mid=$mid";
 				status(!$exitStatus, 
 					$exitStatus 
-						? Match::$T_CREATE_ERROR_MSGS[$exitStatus] 
+						? BloodBowlMatch::$T_CREATE_ERROR_MSGS[$exitStatus]
 						: "<a href='$backFromMatchLink'>Click here</a> to open the match report");
 				if (!$exitStatus) {
 					echo "<br>";
@@ -963,8 +963,8 @@ class Match_HTMLOUT extends Match
 					echo HTMLOUT::nodeList(T_NODE_TOURNAMENT,'trid',array(T_NODE_TOURNAMENT => array('locked' => 0, 'type' => TT_FFA, 'allow_sched' => 1)), array(), array('sel_id' => $trid, 'extra_tags' => array('onChange="document.location.href = \'' . getFormAction('?section=matches&type=usersched') . '&trid=\' + $(this).val();"' ), 'init_option' => '<option value="0">- '.$lng->getTrn('matches/usersched/selecttour')." -</option>\n"));
 					echo ' as ';
 					echo '<select name="round" id="round" '.$_DISABLED.'>';
-					$T_ROUNDS = Match::getRounds();
-					foreach ($T_ROUNDS as $r => $d) {
+					$T_ROUNDS = BloodBowlMatch::getRounds();
+                    foreach ($T_ROUNDS as $r => $d) {
 						echo "<option value='$r' ".(($r == 1) ? 'SELECTED' : '').">".$d."</option>\n";
 					}
 					?>

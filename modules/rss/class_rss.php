@@ -151,7 +151,7 @@ class RSSfeed implements ModuleInterface
                 
                 case T_TEXT_MATCH_SUMMARY:
                     foreach (MatchSummary::getSummaries(RSS_SIZE) as $item) {
-                        $m = new Match($item->match_id);
+                        $m = new BloodBowlMatch($item->match_id);
                         $entries[] = (object) array(
                             'title' => "Match: $m->team1_name ($m->team1_score) vs. $m->team2_name ($m->team2_score)", 
                             'desc' => $m->getText(), 

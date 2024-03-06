@@ -69,7 +69,7 @@ class Star
             ORDER BY date_played DESC LIMIT '.MAX_RECENT_GAMES;
         if (($result = mysql_query($query)) && mysql_num_rows($result) > 0) {
             while ($row = mysql_fetch_assoc($result)) {
-                $m = new Match($row['f_match_id']);
+                $m = new BloodBowlMatch($row['f_match_id']);
                 // Make fake match fields for this star's values.
                 $m->hiredBy          = $row['f_team_id'];
                 $m->hiredAgainst     = ($m->team1_id == $m->hiredBy) ? $m->team2_id : $m->team1_id;

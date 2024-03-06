@@ -99,7 +99,7 @@ class TextSubSys
         if ($get_summaries) {
             foreach (MatchSummary::getSummaries($n, $lid) as $r) {
                 $o = (object) array();
-                $m = new Match($r->match_id);
+                $m = new BloodBowlMatch($r->match_id);
                 // Specific fields:
                 $o->date_mod  = $m->date_modified;
                 $o->match_id  = $m->match_id;

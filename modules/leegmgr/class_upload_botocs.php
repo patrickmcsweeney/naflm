@@ -189,7 +189,7 @@ WHERE match_id = $this->match_id";
             return false;
         }
 
-        $match = new Match( $this->match_id );
+        $match = new BloodBowlMatch( $this->match_id );
         $match->finalizeMatchSubmit(); # Must be run AFTER ALL match data has been submitted. This syncs stats.
         $match->setLocked(true);
 
@@ -370,9 +370,9 @@ WHERE match_id = $this->match_id";
         }
 
         if ( !$this->match_id && $settings['leegmgr_schedule'] !== 'strict' ) {
-            list($exitStatus, $this->match_id) = Match_BOTOCS::create( $input = array("team1_id" => $this->hometeam_id, "team2_id" => $this->awayteam_id, "round" => 1, "f_tour_id" => $this->tour_id, "hash" => $this->hash ) );
+            [$exitStatus, $this->match_id] = Match_BOTOCS::create( $input = array("team1_id" => $this->hometeam_id, "team2_id" => $this->awayteam_id, "round" => 1, "f_tour_id" => $this->tour_id, "hash" => $this->hash ) );
             if ($exitStatus) {
-                $this->error = Match::$T_CREATE_ERROR_MSGS[$exitStatus];
+                $this->error = BloodBowlMatch::$T_CREATE_ERROR_MSGS[$exitStatus];
                 return false;
             }
         }
@@ -388,7 +388,7 @@ WHERE match_id = $this->match_id";
     function matchEntry ( $team_id, $teamPlayers ) {
 
         $addZombie = false;
-        $match = new Match( $this->match_id );
+        $match = new BloodBowlMatch($this->match_id );
 
         $team = new Team( $team_id );
         $players = $team->getPlayers();
@@ -418,7 +418,7 @@ WHERE match_id = $this->match_id";
 
             foreach ( $players as $p  )
             {
-                if ( $p->nr == $player['nr'] && Match::player_validation($p, $match) && !$f_player_id ) {
+                if ( $p->nr == $player['nr'] && BloodBowlMatch::player_validation($p, $match) && !$f_player_id ) {
                     $f_player_id = $p->player_id;
                     break;
                 }
@@ -440,7 +440,7 @@ WHERE match_id = $this->match_id";
             $inj = $this->switchInjury ( $player['inj'] );
 
             $agn1 = $this->switchInjury ( $player['agn1'] );
-            if ( $agn1 > $inj ) list($inj, $agn1) = array($agn1, $inj);
+            if ( $agn1 > $inj ) [$inj, $agn1] = array($agn1, $inj);
             if ( $agn1 == 8 || $agn1 == 2 ) $agn1 = 1;
 
             if ( $f_player_id == ID_MERCS )
@@ -460,7 +460,7 @@ WHERE match_id = $this->match_id";
                 continue;
             }
 
-            if ( !$addZombie && ( Match::player_validation($p, $match) || $player['star'] == "true" ) )
+            if ( !$addZombie && ( BloodBowlMatch::player_validation($p, $match) || $player['star'] == "true" ) )
                 $match->entry( 
                     $f_player_id,
                     $input = array ( 
@@ -475,7 +475,7 @@ WHERE match_id = $this->match_id";
             {
                 global $DEA;
                 $pos_id = $DEA[$team->f_rname]['players']['Zombie']['pos_id'];
-                list($exitStatus, $pid) = Player::create(
+                [$exitStatus, $pid] = Player::create(
                     $input = array(
                         'nr' => $player['nr'], 
                         'f_pos_id' => $pos_id, 
@@ -508,7 +508,7 @@ WHERE match_id = $this->match_id";
 
         foreach ( $players as $p  )
         {
-            if ( Match::player_validation($p, $match) ) {
+            if ( BloodBowlMatch::player_validation($p, $match) ) {
                 $player = new Player ( $p->player_id );
                 $p_matchdata = $match->getPlayerEntry( $player->player_id );
                 if ( empty($p_matchdata) ) {
@@ -532,7 +532,7 @@ WHERE match_id = $this->match_id";
 
     function updateMatch () {
 
-        $match = new Match( $this->match_id );
+        $match = new BloodBowlMatch($this->match_id );
         if (!$this->revUpdate) $match->update( $input = array("submitter_id" => $this->coach_id, "stadium" => $this->hometeam_id, "gate" => $this->gate, "fans" => 0, "ffactor1" => $this->homeff, "ffactor2" => $this->awayff, "fame1" => $this->homefame, "fame2" => $this->awayfame, "income1" => $this->homewinnings, "income2" => $this->awaywinnings, "team1_score" => $this->homescore, "team2_score" => $this->awayscore, "smp1" => 0, "smp2" => 0, "tcas1" => 0, "tcas2" => 0, "tv1" => $this->tv_home, "tv2" => $this->tv_away,) );
         else $match->update( $input = array("submitter_id" => $this->coach_id, "stadium" => $this->hometeam_id, "gate" => $this->gate, "fans" => 0, "ffactor2" => $this->homeff, "ffactor1" => $this->awayff, "fame2" => $this->homefame, "fame1" => $this->awayfame, "income2" => $this->homewinnings, "income1" => $this->awaywinnings, "team2_score" => $this->homescore, "team1_score" => $this->awayscore, "smp1" => 0, "smp2" => 0, "tcas1" => 0, "tcas2" => 0, "tv2" => $this->tv_home, "tv1" => $this->tv_away,) );
 
@@ -740,7 +740,7 @@ WHERE match_id = $this->match_id";
         global $DEA;
         $pos_id = $DEA[$race]['players']['Rotter']['pos_id'];
 
-        list($exitStatus, $pid) = Player::create(
+        [$exitStatus, $pid] = Player::create(
             $input = array(
                 'nr' => $nr, 
                 'f_pos_id' => $pos_id, 
@@ -848,7 +848,7 @@ WHERE match_id = $this->match_id";
         
         if (is_object($coach)) {
             # Tours the logged in coach can "see".
-            list(,,$tours) = Coach::allowedNodeAccess(Coach::NODE_STRUCT__FLAT, $coach->coach_id, array(T_NODE_TOURNAMENT => array('type' => 'type', 'locked' => 'locked', 'f_did' => 'f_did')));
+            [,,$tours] = Coach::allowedNodeAccess(Coach::NODE_STRUCT__FLAT, $coach->coach_id, array(T_NODE_TOURNAMENT => array('type' => 'type', 'locked' => 'locked', 'f_did' => 'f_did')));
             $tourlist = "";
             $coach_lid = ( isset($_SESSION['NS_node_id']) && $_SESSION['NS_node_id'] > 0 ) ? $_SESSION['NS_node_id'] : 1;
             foreach ($tours as $trid => $t)

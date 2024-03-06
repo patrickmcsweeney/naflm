@@ -694,7 +694,7 @@ class Team_HTMLOUT extends Team
 		$mdat = array();
 		foreach (Mercenary::getMercsHiredByTeam($team->team_id, false) as $merc) {
 			$o = (object) array();
-			$m = new Match($merc->match_id);
+			$m = new BloodBowlMatch($merc->match_id);
 			$o->date_played = $m->date_played;
 			$o->opponent = ($m->team1_id == $team->team_id) ? $m->team1_name : $m->team2_name;
 			foreach (array('match_id', 'skills', 'mvp', 'cp', 'td', 'intcpt', 'bh', 'ki', 'si') as $f) {

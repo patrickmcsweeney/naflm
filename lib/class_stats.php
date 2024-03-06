@@ -186,7 +186,7 @@ class Stats
 		if (mysql_num_rows($result) > 0) {
 			while ($r = mysql_fetch_assoc($result)) {
 				if ($mkObjs) {
-					$m = new Match($r['match_id']);
+					$m = new BloodBowlMatch($r['match_id']);
 					$m->result = $r['result'];
 					$matches[] = $m;
 				}

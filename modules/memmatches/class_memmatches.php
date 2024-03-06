@@ -234,7 +234,7 @@ private static function getMemMatches($node = false, $node_id = false) {
         $mObjs = array();
         if (($result = mysql_query($query)) && mysql_num_rows($result) > 0) {
             while ($row = mysql_fetch_assoc($result)) {
-                array_push($mObjs, new Match($row['match_id']));
+                array_push($mObjs, new BloodBowlMatch($row['match_id']));
             }
         }
         elseif (mysql_errno() != 0) {

@@ -384,7 +384,7 @@ function sec_main() {
                           <td> </td>
                       </tr>
                         <?php
-                        list($matches,$pages) = Match::getMatches(array(1, $box['length']), $box['type'], $box['id'], $upcoming); 
+                        list($matches,$pages) = BloodBowlMatch::getMatches(array(1, $box['length']), $box['type'], $box['id'], $upcoming);
                         foreach ($matches as $m) {
                             echo "<tr valign='top'>\n";
                             $t1name = ($settings['fp_links']) ? "<a href='".urlcompile(T_URL_PROFILE,T_OBJ_TEAM,$m->team1_id,false,false)."'>$m->team1_name</a>" : $m->team1_name;

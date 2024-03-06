@@ -21,7 +21,7 @@
  *
  */
 
-class Match_BOTOCS extends Match 
+class Match_BOTOCS extends BloodBowlMatch
 {
     public $hash_botocs = null;
     
