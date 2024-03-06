@@ -55,8 +55,8 @@ class Stats
 		$tbl_name_mv    = $mv_tables[$obj];
 		$tbl_name_mv_es = $mv_es_tables[$obj];
 		$cols_norm  = array_keys($core_tables[$tbl_name_norm]);
-		$cols_mv    = array_filter(array_keys($core_tables[$tbl_name_mv]),    create_function('$c', 'return !preg_match(\'/^f_/\', $c);'));
-		$cols_mv_es = array_filter(array_keys($core_tables[$tbl_name_mv_es]), create_function('$c', 'return !preg_match(\'/^f_/\', $c);'));
+		$cols_mv    = array_filter(array_keys($core_tables[$tbl_name_mv]),    function($c) { return !preg_match('/^f_/', $c); });
+		$cols_mv_es = array_filter(array_keys($core_tables[$tbl_name_mv_es]), function($c) { return !preg_match('/^f_/', $c); });
 		###
 		$objFields_val0 = array_merge(
 			array_key_exists($obj, $objFields_init) ? $objFields_init[$obj] : array(),

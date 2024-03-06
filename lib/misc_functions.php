@@ -265,7 +265,7 @@ function urlcompile($type, $obj, $obj_id, $node, $node_id, $extraGETs = array())
         (($obj_id !== false) ? "&amp;obj_id=$obj_id" : ''). # $obj_id may be = 0 (numeric zero).
         (($node)    ? "&amp;node=$node" : '').
         (($node_id) ? "&amp;node_id=$node_id" : '').
-        implode("\n", array_map(create_function('$key,$val', 'return "$key=&amp;$val";'),array_keys($extraGETs),array_values($extraGETs)));
+        implode("\n", array_map(function($key,$val) { return "$key=&amp;$val"; } ,array_keys($extraGETs),array_values($extraGETs)));
 }
 
 function inlineform($fields, $formName, $buttonText, $myFormElements = array()) {

@@ -65,7 +65,7 @@ class Match_HTMLOUT extends BloodBowlMatch
 		echo '<!-- Following HTML from ./lib/class_match_htmlout.php tourMatches -->';
 		echo '<center><table>';
 		echo '<tr><td>';
-		echo 'Page: '.implode(', ', array_map(create_function('$nr', 'global $page; return ($nr == $page) ? $nr : "<a href=\''.$_url.'page=$nr\'>$nr</a>";'), range(1,$pages)));
+		echo 'Page: '.implode(', ', array_map(function($nr) { global $page; return ($nr == $page) ? $nr : "<a href='".$_url."page=$nr'>$nr</a>";}, range(1,$pages)));
 		echo '</td></td>';
 		echo "<tr><td>    Matches: $cnt</td></td>";
 		echo '</table></center>';
@@ -831,7 +831,7 @@ class Match_HTMLOUT extends BloodBowlMatch
 			$result = mysql_query($query);
 			$NR = mysql_fetch_assoc($result); # Node Relations.
 			$m = new BloodBowlMatch($mid);
-            global $p; # Dirty trick to make $p accessible within create_function() below.
+            global $p; # Dirty trick to make $p accessible within reate_function() below.
 			$status = true;
 			foreach ($players as $teamPlayers) {
 			foreach ($teamPlayers as $p) {
@@ -840,7 +840,7 @@ class Match_HTMLOUT extends BloodBowlMatch
 						'f_pid' => $p['pid'], 'f_tid' => $p['f_tid'], 'f_cid' => $p['f_cid'], 'f_rid' => $p['f_rid'],
 						'f_mid' => $mid, 'f_trid' => $NR['trid'], 'f_did' => $NR['did'], 'f_lid' => $NR['lid']
 					),
-					array_combine(array_keys($ES_fields), array_map(create_function('$f', 'global $p; return (int) $_POST["${f}_$p[pid]"];'), array_keys($ES_fields)))
+					array_combine(array_keys($ES_fields), array_map(function($f) { global $p; return (int) $_POST["${f}_$p[pid]"]; }, array_keys($ES_fields)))
 				);
 			}
 			}
@@ -853,7 +853,7 @@ class Match_HTMLOUT extends BloodBowlMatch
 		title('ES submission');
 		echo "<!-- Following HTML from ./lib/class_match_htmlout.php report_ES -->";
 		echo "<center><a href='index.php?section=matches&amp;type=report&amp;mid=$mid'>".$lng->getTrn('common/back')."</a></center>\n";
-		HTMLOUT::helpBox('<b>Field explanations</b><br><table>'.implode("\n", array_map(create_function('$f,$def', 'return "<tr><td>$f</td><td>$def[desc]</td></tr>";'), array_keys($ES_fields), array_values($ES_fields))).'</table>', '<b>'.$lng->getTrn('common/needhelp').'</b>');
+		HTMLOUT::helpBox('<b>Field explanations</b><br><table>'.implode("\n", array_map(function($f,$def) { return "<tr><td>$f</td><td>$def[desc]</td></tr>"; }, array_keys($ES_fields), array_values($ES_fields))).'</table>', '<b>'.$lng->getTrn('common/needhelp').'</b>');
 		echo "<form method='POST'>\n";
 		foreach ($players as $teamPlayers) {
 			echo "<br>\n";
@@ -862,18 +862,18 @@ class Match_HTMLOUT extends BloodBowlMatch
 			$tid = $teamPlayers[0]['f_tid'];
 			echo "<tr><td colspan='$COLSPAN'><b><a name='thead$tid'>".get_alt_col('teams', 'team_id', $tid, 'name')."</a></b></td></tr>";
 			echo "<tr><td colspan='$COLSPAN'>Player number references:</td></tr>";
-			echo implode('', array_map(create_function('$p', 'return "<tr><td colspan=\''.$COLSPAN.'\'>#$p[nr] $p[name]</td></tr>";'), $teamPlayers));
-			echo "<tr><td colspan='$COLSPAN'>GOTO anchor ".implode(', ', array_map(create_function('$anc', 'return "<a href=\'#'.$tid.'$anc\'>$anc</a>";'), $ES_grps))."</td></tr>";
+			echo implode('', array_map(function($p) { return "<tr><td colspan='$COLSPAN'>#$p[nr] $p[name]</td></tr>";}, $teamPlayers));
+			echo "<tr><td colspan='$COLSPAN'>GOTO anchor ".implode(', ', array_map(function($anc) { return "<a href='#".$tid."$anc'>$anc</a>";}, $ES_grps))."</td></tr>";
 			$grp = null;
 			foreach ($ES_fields as $f => $def) {
 				if ($def['group'] != $grp) {
 					$grp = $def['group'];
 					echo "<tr><td colspan='$COLSPAN'>&nbsp;</td></tr>";
-					echo "<tr style='font-style: italic;'><td><a name='$tid$grp'>$grp</a>&nbsp;|&nbsp;<a href='#thead$tid'>GOTO team head</a></td>".implode('', array_map(create_function('$p', 'return "<td>#$p[nr]</td>";'), $teamPlayers))."</tr>";
+					echo "<tr style='font-style: italic;'><td><a name='$tid$grp'>$grp</a>&nbsp;|&nbsp;<a href='#thead$tid'>GOTO team head</a></td>".implode('', array_map(function($p) { return "<td>#$p[nr]</td>"; }, $teamPlayers))."</tr>";
 					echo "<tr><td colspan='$COLSPAN'><hr></td></tr>";
 				}
 				echo "<tr><td>$f</td>".implode('', array_map(
-					create_function('$p', 'return "<td><input '.(($DIS) ? 'DISABLED' : '').' size=\'2\' maxlength=\'4\' name=\''.$f.'_$p[pid]\' value=\'".(($p[\''.$f.'\']) ? (int) $p[\''.$f.'\'] : 0)."\'></td>";'), $teamPlayers
+					function($p) { return "<td><input ".(($DIS) ? 'DISABLED' : '')." size='2' maxlength='4' name='".$f."_$p[pid]' value='".(($p[$f]) ? (int) $p[$f] : 0)."'></td>";}, $teamPlayers
 				))."</tr>\n";
 			}
 			echo "</table>\n";

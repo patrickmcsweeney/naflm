@@ -258,7 +258,7 @@ function sec_main() {
     
     echo "<div class='main_rightColumn'>\n";
     $boxes_all = array_merge($settings['fp_standings'], $settings['fp_leaders'], $settings['fp_events'], $settings['fp_latestgames']);
-    usort($boxes_all, create_function('$a,$b', 'return (($a["box_ID"] > $b["box_ID"]) ? 1 : (($a["box_ID"] < $b["box_ID"]) ? -1 : 0) );')); 
+    usort($boxes_all, function($a,$b) { return (($a["box_ID"] > $b["box_ID"]) ? 1 : (($a["box_ID"] < $b["box_ID"]) ? -1 : 0) ); }); 
     $boxes = array();
     foreach ($boxes_all as $box) {
         # These fields distinguishes the box types.
@@ -294,8 +294,8 @@ function sec_main() {
                         break 2;
                     }
                     $tour = new Tour($box['id']);
-                    $SR = array_map(create_function('$val', 'return $val[0]."mv_".substr($val,1);'), $tour->getRSSortRule());
-                    break;
+                    $SR = array_map(function($val) { return $val[0]."mv_".substr($val,1);}, $tour->getRSSortRule());
+		    break;
                     
                 case T_NODE_DIVISION: 
                     $_BAD_COLS = array('elo', 'swon', 'slost', 'sdraw', 'win_pct'); # Divisions do not have pre-calculated, MV, values of these fields.
@@ -557,7 +557,7 @@ function _infocus($teams) {
     }
 
     //Sort the array
-    usort($starPlayers, create_function('$objA,$objB', 'return ($objA["spp"] < $objB["spp"]) ? +1 : -1;'));
+    usort($starPlayers, function($objA,$objB) { return ($objA["spp"] < $objB["spp"]) ? +1 : -1; });
     $starPlayers = array_slice($starPlayers, 0, 3); # Show only 3 Star players
 
     ?>

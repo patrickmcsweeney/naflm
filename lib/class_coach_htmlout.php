@@ -50,7 +50,7 @@ class Coach_HTMLOUT extends Coach
 		$_url = "?section=coachlist&amp;";
 		echo '<br><center><table>';
 		echo '<tr><td>';
-		echo $lng->getTrn('common/page').': '.implode(', ', array_map(create_function('$nr', 'global $page; return ($nr == $page) ? $nr : "<a href=\''.$_url.'page=$nr\'>$nr</a>";'), range(1,$pages)));
+		echo $lng->getTrn('common/page').': '.implode(', ', array_map(function($nr) { global $page; return ($nr == $page) ? $nr : "<a href='".$_url."page=$nr'>$nr</a>";}, range(1,$pages)));
 		echo '</td></td>';
 		echo "<tr><td>".$lng->getTrn('common/coaches').": $cnt</td></td>";
 		echo '</table></center><br>';

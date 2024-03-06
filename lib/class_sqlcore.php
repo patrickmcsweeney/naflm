@@ -1301,7 +1301,7 @@ class SQLCore
 		);
 		$status = true;
 		foreach ($indicies as $def) {
-			@mysql_query("DROP INDEX $def[name] ON $def[tbl]");
+			@mysql_query("DROP INDEX IF EXISTS $def[name] ON $def[tbl]");
 			$status &= mysql_query("ALTER TABLE $def[tbl] ADD INDEX $def[name] $def[idx]");
 		}
 		return $status;

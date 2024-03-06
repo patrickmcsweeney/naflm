@@ -70,7 +70,7 @@ $upgradeSQLs = array(
         SQLUpgrade::runIfColumnNotExists('players', 'value', 'ALTER TABLE players ADD COLUMN value MEDIUMINT SIGNED'),
         SQLUpgrade::runIfColumnNotExists('players', 'status', 'ALTER TABLE players ADD COLUMN status TINYINT UNSIGNED'),
         SQLUpgrade::runIfColumnNotExists('players', 'date_died', 'ALTER TABLE players ADD COLUMN date_died DATETIME'),
-        SQLUpgrade::runIfColumnNotExists('players', 'ma', 'ALTER TABLE players ADD COLUMN ('.implode(', ', array_map(create_function('$f','return "$f TINYINT UNSIGNED DEFAULT 0";'), array('ma','st','ag','av','inj_ma','inj_st','inj_ag','inj_av','inj_ni'))).')'),
+        SQLUpgrade::runIfColumnNotExists('players', 'ma', 'ALTER TABLE players ADD COLUMN ('.implode(', ', array_map(function($f) { return "$f TINYINT UNSIGNED DEFAULT 0"; }, array('ma','st','ag','av','inj_ma','inj_st','inj_ag','inj_av','inj_ni'))).')'),
         SQLUpgrade::runIfColumnNotExists('players', 'win_pct', 'ALTER TABLE players ADD COLUMN win_pct FLOAT UNSIGNED DEFAULT 0'),
         SQLUpgrade::runIfColumnNotExists('tours', 'empty', 'ALTER TABLE tours ADD COLUMN empty BOOLEAN DEFAULT TRUE'),
         SQLUpgrade::runIfColumnNotExists('tours', 'begun', 'ALTER TABLE tours ADD COLUMN begun BOOLEAN DEFAULT FALSE'),
@@ -149,7 +149,7 @@ function upgrade_075_080_pskills_migrate() {
     );
         foreach ($players as $p) {
         foreach (array('N' => 'ach_nor_skills', 'D' => 'ach_dob_skills', 'E' => 'extra_skills') as $t => $grp) {
-            $values = empty($p->$grp) ? array() : array_map(create_function('$s', 'global $skillididx_rvs; return "('.$p->player_id.',\''.$t.'\',".$skillididx_rvs[$s].")";'), explode(',', $p->$grp));
+            $values = empty($p->$grp) ? array() : array_map(function($s) { global $skillididx_rvs; return "('.$p->player_id.','.$t.',".$skillididx_rvs[$s].")";}, explode(',', $p->$grp));
 
             if (!empty($values)) {
                 $status &= (mysql_query("INSERT INTO players_skills(f_pid, type, f_skill_id) VALUES ".implode(',', $values)) or die(mysql_error()));
