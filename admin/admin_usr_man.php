@@ -38,7 +38,7 @@ if (isset($_POST['type'])) {
                 'Please enter a non-empty name (login).' => empty($_POST['name']),
                 'The chosen name (login) is already in use. Pick another.' => is_numeric(get_alt_col('coaches', 'name', $_POST['name'], 'coach_id')),
                 'Invalid choice of global access level.' => $_POST['ring'] > $coach->ring,
-                'Can\'t add the new coach to a league in which you are not a commissioner' => isset($_POST['def_leagues']) && 0 < count(array_filter($_POST['def_leagues'], create_function('$lid', 'global $_LEAGUES; return (!isset($_LEAGUES[$lid]) || $_LEAGUES[$lid]["ring"] != '.Coach::T_RING_LOCAL_ADMIN.');'))),
+                'Can\'t add the new coach to a league in which you are not a commissioner' => isset($_POST['def_leagues']) && 0 < count(array_filter($_POST['def_leagues'], function($lid){global $_LEAGUES; return (!isset($_LEAGUES[$lid]) || $_LEAGUES[$lid]["ring"] != '.Coach::T_RING_LOCAL_ADMIN.');})),
                 'The chosen language does not exist!' => !in_array($_POST['lang'], Translations::$registeredLanguages),
             );
             foreach ($errors as $msg => $halt) {

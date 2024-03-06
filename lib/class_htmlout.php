@@ -321,7 +321,7 @@ class HTMLOUT
 		$sortRule = array_merge(
 			($manualSort) ? array((($_GET["dir$opts[GET_SS]"] == 'a') ? '+' : '-') . $_GET["sort$opts[GET_SS]"]) : array(),
 			($obj == T_OBJ_TEAM && $sel_node == T_NODE_TOURNAMENT && is_object($tr = new Tour($sel_node_id)))
-				? array_map(create_function('$val', 'return $val[0]."mv_".substr($val,1);'), $tr->getRSSortRule())
+				? array_map(function($val) {return $val[0]."mv_".substr($val,1);}, $tr->getRSSortRule())
 				: sort_rule($obj)
 		);
 		$set_avg = (isset($_GET['pms']) && $_GET['pms']); // Per match stats?
@@ -336,9 +336,9 @@ class HTMLOUT
 			$fields_long = $grps_long[$sel_sgrp];
 			$fields = array_combine(
 				array_strpack('mv_%s', $fields_long),
-				array_map(create_function('$f', 'return array("desc" => $f);'), $fields_short)
+				array_map(function($f) {return array("desc" => $f);}, $fields_short)
 			);
-			$objFields_avg = array_merge($objFields_avg, array_map(create_function('$k', 'return substr($k, 3);'), array_keys($fields)));
+			$objFields_avg = array_merge($objFields_avg, array_map(function($k) { return substr($k, 3); }, array_keys($fields)));
 		}
 		switch ($obj)
 		{
@@ -1139,7 +1139,7 @@ class HTMLOUT
 		*/
 		global $settings, $lng, $coach;
 		if (array_key_exists('remove', $extra)) {
-			$objs = array_filter($objs, create_function('$obj', 'return ($obj->'.$extra['remove']['condField'].' != '.$extra['remove']['fieldVal'].');'));
+			$objs = array_filter($objs, function($obj) { return ($obj->$extra['remove']['condField'] != $extra['remove']['fieldVal']); });
 		}
 		$MASTER_SORT = array_merge($sort, $std_sort);
 		if (!empty($MASTER_SORT)) {
