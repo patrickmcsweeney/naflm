@@ -45,7 +45,7 @@ class Team_HTMLOUT extends Team
 		$_url = "?section=teamlist&amp;";
 		echo '<br><center><table>';
 		echo '<tr><td>';
-		echo $lng->getTrn('common/page').': '.implode(', ', array_map(create_function('$nr', 'global $page; return ($nr == $page) ? $nr : "<a href=\''.$_url.'page=$nr\'>$nr</a>";'), range(1,$pages)));
+		echo $lng->getTrn('common/page').': '.implode(', ', array_map(function($nr) { global $page; return ($nr == $page) ? $nr : "<a href='".$_url."page=$nr'>$nr</a>";}, range(1,$pages)));
 		echo '</td></td>';
 		echo "<tr><td>".$lng->getTrn('common/teams').": $cnt</td></td>";
 		echo '</table></center><br>';
@@ -1325,7 +1325,7 @@ class Team_HTMLOUT extends Team
 					<?php echo $lng->getTrn('common/player');?>:<br>
 					<select name='player'>
 					<?php
-					$active_players = array_filter($players, create_function('$p', "return (\$p->is_sold || \$p->is_dead || \$p->is_mng) ? false : true;"));
+					$active_players = array_filter($players, function($p) { return ($p->is_sold || $p->is_dead || $p->is_mng) ? false : true;});
 					$DISABLE = true;
 					foreach ($DEA[$team->f_rname]['players'] as $pos => $details) {
 						// Show players on the select list if buyable, or if player is a potential journeyman AND team has not reached journeymen limit.

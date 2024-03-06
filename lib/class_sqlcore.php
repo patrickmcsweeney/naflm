@@ -130,7 +130,7 @@ class SQLCore
 		$mstat_fields_stars  = preg_replace('/tid/', 'match_data.f_team_id', $mstat_fields_player);
 		// ES
 		$common_es_fields_keys = implode(',', array_keys($ES_fields));
-		$common_es_fields      = implode(',', array_map(create_function('$k', 'return "IFNULL(SUM($k),0)";'), array_keys($ES_fields)));
+		$common_es_fields      = implode(',', array_map(function($k) { return "IFNULL(SUM($k),0)"; }, array_keys($ES_fields)));
 		// ELO
 		$elo_matchsync_R0 = '
 			SELECT IF(IFNULL((SELECT SUM(played) FROM mv_teams   WHERE f_tid = tid1 REGEX_REPLACE_HERE),FALSE) AND IFNULL(teams.elo,FALSE),   teams.elo, '.T_ELO_R_0.')   INTO Rt1_0 FROM teams   WHERE team_id = tid1;
