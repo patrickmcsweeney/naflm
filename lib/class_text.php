@@ -221,7 +221,7 @@ class Message extends TextSubSys
         $result = mysql_query("SELECT txt_id 
             FROM texts
             WHERE type = ".T_TEXT_MSG." AND (f_id2 = ".self::T_BROADCAST." OR ".(($lid) ? "f_id2 = $lid" : 'TRUE').") 
-            ORDER BY pinned DESC, date DESC LIMIT $n");
+            ORDER BY date DESC LIMIT $n");
         if ($result && mysql_num_rows($result) > 0) {
             while ($row = mysql_fetch_assoc($result)) {
                 array_push($m, new Message($row['txt_id']));
