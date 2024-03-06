@@ -119,7 +119,7 @@ require_once('lib/misc_functions.php');
 require_once('lib/class_email.php');
 require_once('lib/class_mobile.php');
 require_once('lib/class_sqltriggers.php');
-require_once('lib/class_match.php');
+require_once('lib/class_bloodbowl_match.php');
 require_once('lib/class_tournament.php');
 require_once('lib/class_division.php');
 require_once('lib/class_league.php');

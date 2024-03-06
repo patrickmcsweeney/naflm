@@ -8,7 +8,7 @@ class Tour {
     /*
         Please note: OBBLM also uses a match's "rounds" field to distinguish ordinary matches from semi-finals and finals.
         This means, that some round numbers are reserved for the above purpose.
-        See the constant definitions from class_match.php for reserved round numbers.
+        See the constant definitions from class_bloodbowl_match.php for reserved round numbers.
     */
     /***************
      * Properties
