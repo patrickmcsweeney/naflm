@@ -36,7 +36,7 @@ EOL;
 } else {
 	// Make sure OBBLM is not already installed
 	$conn = mysql_up();
-	if(mysql_query("DESCRIBE coaches")) {
+	if(mysql_query("SHOW TABLES LIKE 'coaches'")->num_rows > 0) {
 		echo <<<EOL
 It seems OBBLM is already installed.<br>You can safely delete the file <i>install.php</i> and go to the main page.
 <br><br>If you need help please visit <a href='http://code.google.com/p/obblm/issues/list'>code.google.com/p/obblm</a> and create a bug report.<br>
