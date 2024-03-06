@@ -44,7 +44,7 @@ $T_INJS = array(
     DEAD => 'DEAD',
 );
 
-class Match
+class BloodBowlMatch
 {
     /***************
      * Properties 
@@ -307,7 +307,7 @@ class Match
         } else {
             // Statuses
             $result = mysql_query("SELECT locked, IF(date_played IS NULL OR date_played = '', FALSE, TRUE) AS 'played' FROM matches WHERE match_id = $mid");
-            list($LOCKED, $PLAYED) = mysql_fetch_array($result);
+            [$LOCKED, $PLAYED] = mysql_fetch_array($result);
             // Node IDs
             $query = "SELECT tour_id AS 'f_tour_id', did AS 'f_did', f_lid AS 'f_lid' FROM matches,tours,divisions WHERE matches.f_tour_id = tours.tour_id AND tours.f_did = divisions.did AND matches.match_id = $mid";
             $result = mysql_query($query);
@@ -490,7 +490,7 @@ class Match
         
         if ($result && mysql_num_rows($result) > 0) {
             while ($row = mysql_fetch_assoc($result)) {
-                array_push($m, new Match($row['match_id']));
+                array_push($m, new BloodBowlMatch($row['match_id']));
             }
         }
         
