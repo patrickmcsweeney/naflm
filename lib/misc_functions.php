@@ -15,21 +15,21 @@ function aasort(&$array, $args) {
 // Sorts array of objects by common object properties. 
 // Usage: objsort($obj_array, array('+X', '-Y')) ...to sort objects by X ascending followed by Y descending.
 function objsort(&$obj_array, $fields) {
-    $idxs = count($fields)-1;   # Number of fields to sort by.
-    $func = 'return ';          # Anonymous function used for sorting the object array.
-    $parens = 0;                # Number of parentheses added to end of anonymous function.
-    for ($i = 0; $i <= $idxs; $i++) {
-        $field = substr($fields[$i], 1, strlen($fields[$i]));
-        $sort_type = substr($fields[$i], 0, 1);
-        $parens += ($i == $idxs ? 1 : 2);
-        $func .= "\$a->$field " . ($sort_type == '+' ? '>' : '<') . " \$b->$field 
-                    ? 1 
-                    : (\$a->$field != \$b->$field 
-                        ? -1 
-                        : " . ($i == $idxs ? '0' : '(');
-    }
-    $func .= str_repeat(')', $parens) . ';';
-    return usort($obj_array, create_function('$a, $b', $func));
+    return usort($obj_array, function($a, $b) {
+	    foreach($fields as $sort_type_and_field) {
+		    $sort_type = substr($sort_type_and_field, 0, 1);
+		    $field = substr($sort_type_and_field, 1, strlen($sort_type_and_field));
+
+		    $order = 0;
+		    if($sort_type == '+') {
+			    $order = $a->$field - $b->$field;
+		    } else {
+			    $order = $b->$field - $a->$field;
+		    }
+
+		    if( $order != 0 ){ return $order; }
+	    }
+    });
 }
 
 define('T_SETUP_GLOBAL_VARS__COMMON',               1);
@@ -110,7 +110,7 @@ function array_strpack($str, array $arr, $implode_delimiter = false, $specifier 
 
 function array_strpack_assoc($str, array $arr, $implode_delimiter = false, $key = '%k', $val = '%v') {
     /* Like array_strpack(), but supports associative array argument. */
-    $ret = array_map(create_function('$k,$v', 'return str_replace(array("'.$key.'","'.$val.'"), array($k,$v), "'.$str.'");'), array_keys($arr),array_values($arr));
+    $ret = array_map(function($k,$v) {return str_replace(array($key,$val), array($k,$v), $str);}, array_keys($arr),array_values($arr));
     return ($implode_delimiter) ? implode($implode_delimiter, $ret) : $ret;
 }
 
@@ -270,7 +270,7 @@ function urlcompile($type, $obj, $obj_id, $node, $node_id, $extraGETs = array())
 
 function inlineform($fields, $formName, $buttonText, $myFormElements = array()) {
     return "<form method='POST' name='$formName' style='display:inline; margin:0px;'>".
-          implode("\n", array_map(create_function('$key,$val', 'return "<input type=\'hidden\' name=\'$key\' value=\'$val\'>";'),array_keys($fields),array_values($fields))).
+          implode("\n", array_map(function($key,$val) { return "<input type='hidden' name='$key' value='$val'>";} ,array_keys($fields),array_values($fields))).
           implode("\n", $myFormElements).
           "<a href='javascript:void(0);' onClick='document.$formName.submit();'>$buttonText</a></form>";
 }

@@ -31,6 +31,7 @@ $STATS_TRANS = array(
 class Stats
 {
 	public static function getRaw($obj, array $filters, $N, array $sortRule, $setAvg) {
+		return array(array(), 1);
 		global $core_tables, $relations_obj, $relations_node, $objFields_extra, $objFields_init;
 		global $mv_keys; # Now in lib/mysql.php
 		$mv_tables = array(
